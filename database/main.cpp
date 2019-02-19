@@ -264,7 +264,7 @@ int getSize()//по-суті кількість елементів в масси
 {
     ifstream file;
     
-    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::in);
+    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::in);//вкажіть шлях до файла
   
     int size;
     
@@ -278,11 +278,11 @@ void setInfoInBinaryFile(vector<Monster> monsters , bool& flag)//записув�
     ofstream file;
 
     if (!flag){ // якщо вперше то файл просто перезаписується новими данними
-        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out);
+        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out);//вкажіть шлях до файла
         flag = true;
     }
     else// якщо ні то до файла додається інформація в кінець
-        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out|ios_base::app);
+        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out|ios_base::app);//вкажіть шлях до файла
 
     int size = monsters.size();
     file.write((char*)&monsters[0], size * sizeof(Monster));
@@ -291,7 +291,7 @@ void setInfoInBinaryFile(vector<Monster> monsters , bool& flag)//записув�
 void setSizeInBinaryFile(vector<Monster> monsters)//записування кількості елементів в окремий файл
 {
     ofstream sizeFile;
-    sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin", ios_base::binary|ios_base::out);
+    sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin", ios_base::binary|ios_base::out);//вкажіть шлях до файла
 
     int size = monsters.size();
 
@@ -302,7 +302,7 @@ void setSizeInBinaryFile(vector<Monster> monsters)//записування кі�
 vector<Monster> readFromBinaryFile(int size)
 {
     ifstream file;
-    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::in);
+    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::in);//вкажіть шлях до файла
     vector<Monster> monsters(size);
     file.read ((char*)&monsters[0],monsters.size()* sizeof(Monster));
     file.close();
@@ -316,7 +316,7 @@ vector<Monster> readFromSqlTable()//зчитування з sqlite бази да
     int rc;
     Monster monster;
     sqlite3_stmt *res;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
     if ( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
         
@@ -344,7 +344,7 @@ vector<Monster> readFromSqlTable()//зчитування з sqlite бази да
 int insertIntoSqlTable(vector<Monster> monsters)//записування в sqlite базу данних
 {
     sqlite3 *db;
-    int rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
+    int rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
     
     if (rc != SQLITE_OK) {
         
@@ -424,7 +424,7 @@ void deleteAllDataFromSqlite()//видалення усіх елементів(�
 {
     sqlite3 *db;
     int rc;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, "Delete From Monster", -1, &stmt, NULL);
     rc = sqlite3_step(stmt);
@@ -434,7 +434,7 @@ void deleteDataByID(int id)//функція яка видаляє з бази д
 {
     sqlite3 *db;
     int rc;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, "Delete From Monster Where ID = ?1", -1, &stmt, NULL);
     sqlite3_bind_int(stmt, 1, id);
@@ -478,7 +478,7 @@ void benchmarkBinary(int n)//в бенчмарку на початку вида�
 {
     int time = 0;
     fstream sizeFile;
-    sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::out);
+    sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::out);//вкажіть шлях до файла
     int size = 0;
     sizeFile.write((char*)&size, sizeof(size));
     sizeFile.close();
