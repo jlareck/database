@@ -28,19 +28,6 @@ struct Monster{
     string date;
     string time;
 };
-//enum ultimateAttacks{ increaseDamage, extraDamage, healSelf, disableEnemy};
-
-//bool checkId(vector<Monster>& monsters, string id)//перевірка на унікальність ID
-//{
-//    for (int i = 0; i < monsters.size(); i++)
-//    {
-//        if(monsters[i].id == id )
-//        {
-//            return false;
-//        }
-//    }
-//    return true;
-//}
 //void getInfo(vector<Monster>&monsters) // Для читання з текстового файла
 //{
 //    ifstream file;
@@ -92,7 +79,7 @@ struct Monster{
 //    }
 //    file.close();
 //}
-void createAndAddMonster(vector<Monster>& monsters)//создає і добавляє в вектор елемент
+void createAndAddMonster(vector<Monster>& monsters)//юзер создає і добавляє в вектор елемент
 {
     Monster monster;
     cout << "Enter Name"<<endl;
@@ -165,7 +152,7 @@ void printOneMonster(Monster monster)
     cout << "Date of creation the monster: "<<monster.date << endl;
     cout << endl;
 }
-void addRandomMonster(vector<Monster>& monsters)
+void addRandomMonster(vector<Monster>& monsters)//cтворюється рандомний монстр і виводиться на екран
 {
    // ctime(0);
     srand ( time(nullptr) );
@@ -263,9 +250,9 @@ void printAll(vector<Monster>monster)
 }
 
 
-void findMonsterByName(string name, vector<Monster> monsters)
+void findMonsterByName(string name, vector<Monster> monsters)//юзер задає початок слова по якому відбуватиметься пошук монстра
 {
-    
+    bool find = false;
     for (int i = 0; i < monsters.size(); i++)
     {
         int j = 0;
@@ -273,11 +260,15 @@ void findMonsterByName(string name, vector<Monster> monsters)
         {
             j++;
         }
-        if (j==name.length())
+        if (j==name.length()){
             printOneMonster(monsters[i]);
+            find =true;
+        }
     }
+    if (!find)
+        cout << "There is no match in system" <<endl;
 }
-void findMonsterByUltimateAttack(string ult, vector<Monster> monsters )
+void findMonsterByUltimateAttack(string ult, vector<Monster> monsters )//юзер має ввести точну назву спеціальної атаки
 {
     bool flag = false;
     for (int i = 0; i < monsters.size(); i++)
@@ -292,58 +283,66 @@ void findMonsterByUltimateAttack(string ult, vector<Monster> monsters )
 }
 void findMonsterByRangeOfDamage(int lower, int higher, vector<Monster> monsters)
 {
-    
+    bool find = false;
     for(int i = 0; i < monsters.size(); i++)
     {
         
         if (stoi(monsters[i].damage)<higher && stoi(monsters[i].damage)>lower){
             printOneMonster(monsters[i]);
+            find = true;
             
         }
     }
+    if(!find)
+        cout <<"There is no match in system" <<endl;
 }
 void findMonsterAfterSomeDate(string date,string time, vector<Monster> monsters)
 {
+    bool find = false;
     for(int i = 0; i < monsters.size(); i++)
     {
         if (monsters[i].date > date){
             printOneMonster(monsters[i]);
+            find  = true;
         }
         else if(date==monsters[i].date)
-            if (monsters[i].time>time)
+            if (monsters[i].time>time){
                 printOneMonster(monsters[i]);
+                find = true;
+            }
     }
+    if(!find)
+        cout << "There is no match in system" <<endl;
 }
 int getSize()//по-суті кількість елементів в массиві може виступати за останнє id тому зчитування кількості елементів я виділив в окрему функцію
 {
     ifstream file;
     
     file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::in);
-  //  file.clear();
+  
     int size;
-    //file.seekg(0);
+    
     file.read ((char*)&size,sizeof(int));
     file.close();
     
     return size;
 }
-void setInfoInBinaryFile(vector<Monster> monsters , bool& flag){
+void setInfoInBinaryFile(vector<Monster> monsters , bool& flag)//записування даних в бінарний файл flag - виступає як змінна яка показує чи відкривається цей файл вперше під час запуску програми
+{
     ofstream file;
 
-    if (!flag){
+    if (!flag){ // якщо вперше то файл просто перезаписується новими данними
         file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out);
         flag = true;
     }
-    else
+    else// якщо ні то до файла додається інформація в кінець
         file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::out|ios_base::app);
-    
-  //  int pos = file.tellp();
-//    file.seekp(pos);
+
     int size = monsters.size();
     file.write((char*)&monsters[0], size * sizeof(Monster));
     file.close();
 }
-void setSizeInBinaryFile(vector<Monster> monsters)
+void setSizeInBinaryFile(vector<Monster> monsters)//записування кількості елементів в окремий файл
 {
     ofstream sizeFile;
     sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin", ios_base::binary|ios_base::out);
@@ -359,29 +358,19 @@ vector<Monster> readFromBinaryFile(int size)
     ifstream file;
     file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin",ios_base::binary|ios_base::in);
     vector<Monster> monsters(size);
-    cout<<"SIZE" << size<<endl;
     file.read ((char*)&monsters[0],monsters.size()* sizeof(Monster));
     file.close();
     return monsters;
 }
 
-void deleteMonsterByID(vector<Monster>&monsters, string id)
-{
-    int size = monsters.size();
-    for (int i = 0; i < size; i++)
-    {
-        if (monsters[i].id==id) monsters.erase(monsters.begin()+i);
-    }
-}
-
-vector<Monster> readFromSqlTable()
+vector<Monster> readFromSqlTable()//зчитування з sqlite бази данних
 {
     vector<Monster> monsters;
     sqlite3 *db;
     int rc;
     Monster monster;
     sqlite3_stmt *res;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/sqliteTest/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
     if ( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
         
@@ -406,9 +395,10 @@ vector<Monster> readFromSqlTable()
     sqlite3_close(db);
     return monsters;
 }
-int insertIntoSqlTable(vector<Monster> monsters) {
+int insertIntoSqlTable(vector<Monster> monsters)//записування в sqlite базу данних
+{
     sqlite3 *db;
-    int rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/sqliteTest/Monsters.db", &db);
+    int rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
     
     if (rc != SQLITE_OK) {
         
@@ -468,8 +458,9 @@ int insertIntoSqlTable(vector<Monster> monsters) {
 
 void demo(vector<Monster> monsters)
 {
-    insertIntoSqlTable(monsters);
+    
     addRandomMonster(monsters);
+    insertIntoSqlTable(monsters);
     monsters = readFromSqlTable();
     cout << "All monsters"<<endl;
     printAll(monsters);
@@ -483,21 +474,21 @@ void demo(vector<Monster> monsters)
     findMonsterAfterSomeDate("2019-02-10", "11.31.01", monsters);
     cout << "The end"<<endl;
 }
-void deleteAllDataFromSqlite()
+void deleteAllDataFromSqlite()//видалення усіх елементів(для бенчмарка щоб при запуску цього режиму база даних була чиста)
 {
     sqlite3 *db;
     int rc;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/sqliteTest/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, "Delete From Monster", -1, &stmt, NULL);
     rc = sqlite3_step(stmt);
     sqlite3_close(db);
 }
-void deleteDataByID(int id)
+void deleteDataByID(int id)//функція яка видаляє з бази даних
 {
     sqlite3 *db;
     int rc;
-    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/sqliteTest/Monsters.db", &db);
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);
     sqlite3_stmt *stmt;
     sqlite3_prepare_v2(db, "Delete From Monster Where ID = ?1", -1, &stmt, NULL);
     sqlite3_bind_int(stmt, 1, id);
@@ -534,31 +525,26 @@ void benchmarkSql( int n)
         time = (end_time-start_time)/(1000*320);
     }
     cout << "Number of added elements: " << monsters.size();
+    cout << "Time of working: "<<time<<endl;
    
 }
-void benchmarkBinary(int n)
+void benchmarkBinary(int n)// невпевнений що правильно працює ця функція тому що в дивному порядку іноді виводить елементи, але я не до кінця розумію чому
 {
     int time = 0;
 
     int k = 0;
     fstream sizeFile;
     sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::out);
-
+    int size = 0;
+    sizeFile.write((char*)&size, sizeof(size));
+    sizeFile.close();
      vector<Monster>monsters;
     bool flag = false;
-    while(time<10){         // поки час не перевищив 10 секунд
-     
-         // встановлюємо id починаючи з останнього елемента (кількість елементів = id)
+    while(time<1){
         int start_time = clock();
-        //k = getSize();
-        cout << getSize()<<endl;
-       
         for(int i = getSize(); i < n; i++)
         {
-            cout<< "Size " << i<<endl;
-         
             addRandomMonster(monsters, i);
-         
         }
         setInfoInBinaryFile(monsters, flag);
         setSizeInBinaryFile(monsters);
@@ -566,26 +552,24 @@ void benchmarkBinary(int n)
         cout << "Searching by beginning name Ter" <<endl;
         findMonsterByName("Ter", monsters);
         cout << "Searching by range of damage from 25 to 70" << endl;
-       findMonsterByRangeOfDamage(25, 70, monsters);
+        findMonsterByRangeOfDamage(25, 70, monsters);
         cout << "Searching by ultimate attack increase damage"<<endl;
         findMonsterByUltimateAttack("increase damage", monsters);
         cout << "Searching monsters after time: 11.31.01 and date: 2019-02-10" <<endl;
         findMonsterAfterSomeDate("2019-02-09", "11.31.01", monsters);
         cout << "The end"<<endl;
         int end_time = clock();
-        cout<< "Time of working" <<( end_time-start_time)/(1000*320)<<endl;
+        
         time =( end_time-start_time)/(1000*320);
         
         n*=2;
     }
-
     cout<< "Number of added elements" << monsters.size()<<endl;
-    int size = 0;
-    sizeFile.write((char*)&size, sizeof(size));
-    sizeFile.close();
+    cout<< "Time of working: " <<time<<endl;
+
  
 }
-void interactiveInterface(vector<Monster> monster)
+void interactiveInterface(vector<Monster> monster)//усі дані збережені в інтерактивному режимі зберігаються в базу даних Sqlite
 {
     bool flag = true, flagForSettingData = false;
     int action;
@@ -612,13 +596,10 @@ void interactiveInterface(vector<Monster> monster)
                 printAll(monster);
                 break;
             case 3:
-              //  setInfo(monster, flagForSettingData);
                 insertIntoSqlTable(monster);
                  cout << "Data has been saved"<<endl;
                 break;
             case 4:
-               // getInfo(monster);
-             //   flagForSettingData = true;
                 monster = readFromSqlTable();
                 cout << "Data has been read"<<endl;
                 break;
@@ -705,6 +686,7 @@ void launch ()
             break;
         case 4:
             benchmarkBinary(5);
+            break;
         default:
             cout << "Error" <<endl;
             break;
@@ -714,10 +696,5 @@ void launch ()
 int main()
 {
     launch();
-   // benchmarkBinary(1);
-    //deleteAllDataFromSqlite();
-   // benchmarkSql(1);
-    //readFromSqlTable(monsters);
-    //printAll(monsters);
     return 0;
 }
