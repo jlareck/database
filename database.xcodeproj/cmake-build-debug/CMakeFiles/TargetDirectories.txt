@@ -1,0 +1,3 @@
+/Users/mykolamedynsky/Desktop/1semester/database/database.xcodeproj/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/mykolamedynsky/Desktop/1semester/database/database.xcodeproj/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/mykolamedynsky/Desktop/1semester/database/database.xcodeproj/cmake-build-debug/CMakeFiles/database_xcodeproj.dir
