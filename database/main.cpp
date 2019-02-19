@@ -28,57 +28,6 @@ struct Monster{
     string date;
     string time;
 };
-//void getInfo(vector<Monster>&monsters) // Для читання з текстового файла
-//{
-//    ifstream file;
-//    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data");
-//    string line;
-//    Monster monster;
-//    //  int i = 0;
-//    string a;
-//    getline(file, a);
-//    while (!file.eof()){
-//        //string var;
-//        getline(file, line);
-//        if (line=="")
-//        {
-//            continue;
-//        }
-//        else{
-//            monster.id = line;
-//            getline(file, monster.name);
-//            getline(file, monster.healthPoint);
-//            getline(file, monster.damage);
-//            getline(file, monster.chanceOfUltimateAttack);
-//            getline(file, monster.ultimateAttack);
-//            getline(file, monster.time);
-//            getline(file, monster.date);
-//            monsters.push_back(monster);
-//        }
-//    }
-//    file.close();
-//}
-//
-//void setInfo(vector<Monster> monsters, bool flag){//записування в текстовий файл
-//    ofstream file;
-//    if(!flag)
-//        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data", ios_base::app);
-//    else
-//        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data");
-//    file<<monsters.size()<<endl;
-//    for (int i = 0; i < monsters.size(); i++){
-//        file << monsters[i].id<< endl;
-//        file << monsters[i].name << endl;
-//        file << monsters[i].healthPoint << endl;
-//        file << monsters[i].damage << endl;
-//        file << monsters[i].chanceOfUltimateAttack <<endl;
-//        file << monsters[i].ultimateAttack << endl;
-//        file << monsters[i].time << endl;
-//        file << monsters[i].date << endl;
-//
-//    }
-//    file.close();
-//}
 void createAndAddMonster(vector<Monster>& monsters)//юзер создає і добавляє в вектор елемент
 {
     Monster monster;
@@ -197,9 +146,6 @@ void addRandomMonster(vector<Monster>& monsters, int i)//для бенчмарк
     srand ( time(nullptr) );
     Monster monster;
    monster.id = to_string(i);
-//    identifier++;
-
-   // cout << monster.id<<endl;
     string names[] = {"Witch doctor", "Medusa", "Terrorblade", "Storm spirit", "Pudge", "Anti-Mage","Phantom Assasin"};
     monster.name = names[rand()%7];
     int a = rand()%100;
@@ -456,9 +402,9 @@ int insertIntoSqlTable(vector<Monster> monsters)//записування в sqli
     return 0;
 }
 
-void demo(vector<Monster> monsters)
+void demo()
 {
-    
+    vector<Monster> monsters;
     addRandomMonster(monsters);
     insertIntoSqlTable(monsters);
     monsters = readFromSqlTable();
@@ -484,7 +430,7 @@ void deleteAllDataFromSqlite()//видалення усіх елементів(�
     rc = sqlite3_step(stmt);
     sqlite3_close(db);
 }
-void deleteDataByID(int id)//функція яка видаляє з бази даних
+void deleteDataByID(int id)//функція яка видаляє з бази даних Sqlite
 {
     sqlite3 *db;
     int rc;
@@ -495,7 +441,7 @@ void deleteDataByID(int id)//функція яка видаляє з бази д
     rc = sqlite3_step(stmt);
     sqlite3_close(db);
 }
-void benchmarkSql( int n)
+void benchmarkSql( int n)//якщо що в бенчмарку на початку видаляються всі елементи
 {
     deleteAllDataFromSqlite();
     vector<Monster>monsters;
@@ -528,11 +474,9 @@ void benchmarkSql( int n)
     cout << "Time of working: "<<time<<endl;
    
 }
-void benchmarkBinary(int n)// невпевнений що правильно працює ця функція тому що в дивному порядку іноді виводить елементи, але я не до кінця розумію чому
+void benchmarkBinary(int n)//в бенчмарку на початку видаляються всі елементи. І я невпевнений в тому що правильно працює ця функція тому що в дивному порядку іноді виводить елементи, але я не до кінця розумію чому
 {
     int time = 0;
-
-    int k = 0;
     fstream sizeFile;
     sizeFile.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size.bin",ios_base::binary|ios_base::out);
     int size = 0;
@@ -569,9 +513,10 @@ void benchmarkBinary(int n)// невпевнений що правильно п�
 
  
 }
-void interactiveInterface(vector<Monster> monster)//усі дані збережені в інтерактивному режимі зберігаються в базу даних Sqlite
+void interactiveInterface()//усі дані збережені в інтерактивному режимі зберігаються в базу даних Sqlite
 {
-    bool flag = true, flagForSettingData = false;
+    vector<Monster> monster;
+    bool flag = true;
     int action;
     while (flag)
     {
@@ -585,7 +530,8 @@ void interactiveInterface(vector<Monster> monster)//усі дані збереж
         cout << 8 << " - Find monster that was created after some time" << endl;
         cout << 9 << " - Create random monster" <<endl;
         cout << 10 << " - Delete monster by ID" <<endl;
-        cout << 11 << " - Exit" << endl;
+        cout << 11 << " - Delete all data"<<endl;
+        cout << 12 << " - Exit" << endl;
         cout << "Enter action" << endl;
         cin >> action;
         switch (action) {
@@ -650,11 +596,17 @@ void interactiveInterface(vector<Monster> monster)//усі дані збереж
                 break;
             }
             case 11:{
+                deleteAllDataFromSqlite();
+                cout << "All data has been deleted" <<endl;
+                break;
+            }
+            case 12:{
                 flag = false;
                 insertIntoSqlTable(monster);
                 cout << "Data has been saved. Good bye!"<<endl;
                 break;
             }
+            
             default:
                 cout << "Error! Unexpected exit"<<endl;
                 flag = false;
@@ -665,7 +617,7 @@ void interactiveInterface(vector<Monster> monster)//усі дані збереж
 
 void launch ()
 {
-    vector<Monster> monsters;
+    
     int action;
    
     cout << "Enter action" <<endl;
@@ -676,10 +628,10 @@ void launch ()
      cin>> action;
     switch (action) {
         case 1:
-            interactiveInterface(monsters);
+            interactiveInterface();
             break;
         case 2:
-            demo(monsters);
+            demo();
             break;
         case 3:
             benchmarkSql(5);
