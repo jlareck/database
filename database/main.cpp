@@ -6,18 +6,17 @@
 //  Copyright © 2019 Mykola Medynskyi. All rights reserved.
 //
 
-
-#include <iostream>
 #include <ctime>
 #include <vector>
 #include <sstream>
 #include <fstream>
 #include <string>
-#include <stdlib.h>
-#include <time.h>
 #include <sqlite3.h>
+#include <stdlib.h>
+#include <iostream>
 #include <stdio.h>
 using namespace std;
+
 struct Monster{
     string id;
     string name;
@@ -315,7 +314,7 @@ vector<Monster> readFromSqlTable()//зчитування з sqlite бази да
     sqlite3 *db;
     int rc;
     Monster monster;
-    sqlite3_stmt *res;
+    sqlite3_stmt *stmt;
     rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
     if ( rc ) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -324,27 +323,30 @@ vector<Monster> readFromSqlTable()//зчитування з sqlite бази да
     else {
         fprintf(stderr, "Opened database successfully\n");
     }
-    rc = sqlite3_prepare_v2(db, "SELECT ID, name, Health, Damage, UltChance, UltType, Date, Time FROM Monster Where Id", -1, &res, 0);
-    while(sqlite3_step(res) == SQLITE_ROW)
+    rc = sqlite3_prepare_v2(db, "SELECT ID, name, Health, Damage, UltChance, UltType, Date, Time FROM Monster Where Id", -1, &stmt, 0);
+   
+    while(sqlite3_step(stmt) == SQLITE_ROW)
     {
-        monster.id = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 0)));
-        monster.name = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 1)));
-        monster.healthPoint = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 2)));
-        monster.damage = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 3)));
-        monster.chanceOfUltimateAttack = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 4)));
-        monster.ultimateAttack = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 5)));
-        monster.date = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 6)));
-        monster.time = string(reinterpret_cast<const char *>(sqlite3_column_text(res, 7)));
+        monster.id = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0)));
+        monster.name = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1)));
+        monster.healthPoint = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)));
+        monster.damage = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3)));
+        monster.chanceOfUltimateAttack = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4)));
+        monster.ultimateAttack = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 5)));
+        monster.date = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 6)));
+        monster.time = string(reinterpret_cast<const char *>(sqlite3_column_text(stmt, 7)));
         monsters.push_back(monster);
         
     }
+    
     sqlite3_close(db);
     return monsters;
 }
-int insertIntoSqlTable(vector<Monster> monsters)//записування в sqlite базу данних
+int insertIntoSqlTable(vector<Monster>& monsters)//записування в sqlite базу данних
 {
     sqlite3 *db;
     int rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
+    
     
     if (rc != SQLITE_OK) {
         
@@ -354,38 +356,36 @@ int insertIntoSqlTable(vector<Monster> monsters)//записування в sqli
         return 1;
     }
     for (int i = 0; i<monsters.size(); i++){
-      
-        char name [monsters[i].name.length()+1];
-        strcpy(name, monsters[i].name.c_str());
+        const char* name = monsters[i].name.c_str();
+    //    strcpy(name, monsters[i].name.c_str());
         
-        char health [monsters[i].healthPoint.length()+1];
-        strcpy(health, monsters[i].healthPoint.c_str());
+        const char* health = monsters[i].healthPoint.c_str();
+     //   strcpy(health, monsters[i].healthPoint.c_str());
         
-        char damage [monsters[i].damage.length()+1];
-        strcpy(damage, monsters[i].damage.c_str());
+        const char* damage = monsters[i].damage.c_str();
+      //  strcpy(damage, monsters[i].damage.c_str());
         
-        char ultChance [monsters[i].chanceOfUltimateAttack.length()+1];
-        strcpy(ultChance, monsters[i].chanceOfUltimateAttack.c_str());
+        const char* ultChance = monsters[i].chanceOfUltimateAttack.c_str();
+        //strcpy(ultChance, monsters[i].chanceOfUltimateAttack.c_str());
         
-        char ultType [monsters[i].ultimateAttack.length()+1];
-        strcpy(ultType, monsters[i].ultimateAttack.c_str());
+        const char* ultType = monsters[i].ultimateAttack.c_str();
+       // strcpy(ultType, monsters[i].ultimateAttack.c_str());
         
-        char date [monsters[i].date.length()+1];
-        strcpy(date, monsters[i].date.c_str());
+        const char* date = monsters[i].date.c_str();
+  //      strcpy(date, monsters[i].date.c_str());
         
-        char time [monsters[i].time.length()+1];
-        strcpy(time, monsters[i].time.c_str());
+        const char* time = monsters[i].time.c_str();
+      //  strcpy(time, monsters[i].time.c_str());
         
         
         sqlite3_stmt *stmt;
         if (monsters[i].id==""){
         sqlite3_prepare_v2(db, "INSERT INTO Monster (Name, Health, Damage, UltChance, UltType, Date, Time) values (?2, ?3, ?4, ?5, ?6, ?7, ?8);", -1, &stmt, NULL);
-            
         }
         else{
             sqlite3_prepare_v2(db, "INSERT INTO Monster (ID, Name, Health, Damage, UltChance, UltType, Date, Time) values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8);", -1, &stmt, NULL);
             int id = stoi(monsters[i].id);
-             sqlite3_bind_int(stmt, 1, id);
+            sqlite3_bind_int(stmt, 1, id);
         }
        
         sqlite3_bind_text(stmt, 2, name, -1, SQLITE_STATIC);
@@ -397,7 +397,10 @@ int insertIntoSqlTable(vector<Monster> monsters)//записування в sqli
         sqlite3_bind_text(stmt, 8, time, -1, SQLITE_STATIC);
       
         rc = sqlite3_step(stmt);
+        monsters[i].id = to_string(sqlite3_last_insert_rowid(db));
+        cout << monsters[i].id<<endl;
     }
+   
     sqlite3_close(db);
     return 0;
 }
@@ -441,11 +444,34 @@ void deleteDataByID(int id)//функція яка видаляє з бази д
     rc = sqlite3_step(stmt);
     sqlite3_close(db);
 }
+
+int get_file_size(std::string filename) // path to file
+{
+    FILE *p_file = NULL;
+    p_file = fopen(filename.c_str(),"rb");
+    fseek(p_file,0,SEEK_END);
+    int size = ftell(p_file);
+    fclose(p_file);
+    return size;
+}
+void vacuum()
+{
+    sqlite3 *db;
+    int rc;
+    rc = sqlite3_open("/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db", &db);//вкажіть шлях до файла
+    sqlite3_stmt *stmt;
+    sqlite3_prepare_v2(db, "Vacuum", -1, &stmt, NULL);
+    rc = sqlite3_step(stmt);
+    sqlite3_close(db);
+}
 void benchmarkSql( int n)//якщо що в бенчмарку на початку видаляються всі елементи
 {
     deleteAllDataFromSqlite();
+    vacuum();
     vector<Monster>monsters;
-    int time=0;
+    string file = "/Users/mykolamedynsky/Desktop/1semester/database/database/Monsters.db";
+    
+    double time=0;
     int k = 0;
     while(time<10){
         int start_time = clock();
@@ -467,13 +493,14 @@ void benchmarkSql( int n)//якщо що в бенчмарку на початк
         int end_time = clock();
         k = n;
         n*=2;
-        cout<< "Time of working" <<( end_time-start_time)/(1000*320)<<endl;
+        cout<< "For " << n << " elements "<< " Bytes: " <<  get_file_size(file)<< "  Time of working (seconds): " <<(double)( end_time-start_time)/(1000*320)<<endl;
         time = (end_time-start_time)/(1000*320);
     }
     cout << "Number of added elements: " << monsters.size();
     cout << "Time of working: "<<time<<endl;
    
 }
+
 void benchmarkBinary(int n)//в бенчмарку на початку видаляються всі елементи. І я невпевнений в тому що правильно працює ця функція тому що в дивному порядку іноді виводить елементи, але я не до кінця розумію чому
 {
     int time = 0;
@@ -482,9 +509,10 @@ void benchmarkBinary(int n)//в бенчмарку на початку вида�
     int size = 0;
     sizeFile.write((char*)&size, sizeof(size));
     sizeFile.close();
-     vector<Monster>monsters;
+    vector<Monster>monsters;
+    string file = "/Users/mykolamedynsky/Desktop/1semester/database/database/data.bin";
     bool flag = false;
-    while(time<1){
+    while(time<10){
         int start_time = clock();
         for(int i = getSize(); i < n; i++)
         {
@@ -503,7 +531,8 @@ void benchmarkBinary(int n)//в бенчмарку на початку вида�
         findMonsterAfterSomeDate("2019-02-09", "11.31.01", monsters);
         cout << "The end"<<endl;
         int end_time = clock();
-        
+        cout<< "For " << n << " elements "<< " Bytes: " <<  get_file_size(file)<< "  Time of working (seconds): " <<(double)( end_time-start_time)/(1000*320)<<endl;
+
         time =( end_time-start_time)/(1000*320);
         
         n*=2;
@@ -517,6 +546,7 @@ void interactiveInterface()//усі дані збережені в інтера�
 {
     vector<Monster> monster;
     bool flag = true;
+    
     int action;
     while (flag)
     {
@@ -531,7 +561,7 @@ void interactiveInterface()//усі дані збережені в інтера�
         cout << 9 << " - Create random monster" <<endl;
         cout << 10 << " - Delete monster by ID" <<endl;
         cout << 11 << " - Delete all data"<<endl;
-        cout << 12 << " - Exit" << endl;
+        cout << 12 << " - Save data and exit" << endl;
         cout << "Enter action" << endl;
         cin >> action;
         switch (action) {
@@ -543,7 +573,7 @@ void interactiveInterface()//усі дані збережені в інтера�
                 break;
             case 3:
                 insertIntoSqlTable(monster);
-                 cout << "Data has been saved"<<endl;
+                cout << "Data has been saved"<<endl;
                 break;
             case 4:
                 monster = readFromSqlTable();
@@ -606,7 +636,6 @@ void interactiveInterface()//усі дані збережені в інтера�
                 cout << "Data has been saved. Good bye!"<<endl;
                 break;
             }
-            
             default:
                 cout << "Error! Unexpected exit"<<endl;
                 flag = false;
@@ -645,6 +674,7 @@ void launch ()
     }
     
 }
+
 int main()
 {
     launch();
