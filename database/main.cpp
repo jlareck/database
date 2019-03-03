@@ -241,8 +241,7 @@ void findMonsterByRangeOfDamage(int lower, int higher, vector<Monster> monsters)
     if(!find)
         cout <<"There is no match in system" <<endl;
 }
-void findMonsterAfterSomeDate(string date,string time, vector<Monster> monsters)
-{
+void findMonsterAfterSomeDate(string date,string time, vector<Monster> monsters) {
     bool find = false;
     for(int i = 0; i < monsters.size(); i++)
     {
@@ -669,7 +668,7 @@ void launch ()
             benchmarkBinary(5);
             break;
         default:
-            cout << "Error" <<endl;
+            cout << "Error! there is no option " << action <<endl;
             break;
     }
     
