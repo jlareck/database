@@ -16,7 +16,6 @@
 #include <stdio.h>
 #include <time.h>
 using namespace std;
-//enum ultimateAttacks{ increaseDamage, extraDamage, healSelf, disableEnemy};
 struct Monster{
     string id;
     string name;
@@ -27,22 +26,10 @@ struct Monster{
     string date;
     string time;
 };
-//bool checkId(vector<Monster>& monsters, string id)//перевірка на унікальність ID
-//{
-//    for (int i = 0; i < monsters.size(); i++)
-//    {
-//        if(monsters[i].id == id )
-//        {
-//            return false;
-//        }
-//    }
-//    return true;
-//}
+
 int identifier;
 void createAndAddMonster(vector<Monster>& monsters)
 {
-
-
     Monster monster;
     cout << "ID"<<endl;
 
@@ -207,13 +194,11 @@ void findMonsterByUltimateAttack(string ult, vector<Monster> monsters )
 }
 void findMonsterByRangeOfDamage(int lower, int higher, vector<Monster> monsters)
 {
-    //cout << "fadsf"<<endl;
     for(int i = 0; i < monsters.size(); i++)
     {
-     //   cout << "fadsf"<<endl;
+  
         if (stoi(monsters[i].damage)<higher && stoi(monsters[i].damage)>lower){
             printOneMonster(monsters[i]);
-           // cout << "fadsf"<<endl;
         }
     }
 }
@@ -275,7 +260,6 @@ void getInfo(vector<Monster>&monsters)
     file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data");
     string line;
     Monster monster;
-  //  int i = 0;
     string a;
     getline(file, a);
     while (!file.eof()){
@@ -296,21 +280,9 @@ void getInfo(vector<Monster>&monsters)
             getline(file, monster.date);
             monsters.push_back(monster);
         }
-        //getline(file, line);
-        //cout << 1<<endl;
-       
     }
     file.close();
 }
-void deleteMonsterByID(vector<Monster>&monsters, string id)
-{
-    int size = monsters.size();
-    for (int i = 0; i < size; i++)
-    {
-        if (monsters[i].id==id) monsters.erase(monsters.begin()+i);
-    }
-}
-
 void demo(vector<Monster> monsters)
 {
     getInfo(monsters);
@@ -327,29 +299,6 @@ void demo(vector<Monster> monsters)
     findMonsterAfterSomeDate("2019-02-10", "11.31.01", monsters);
     cout << "The end"<<endl;
 }
-void benchmark( int n)
-{
-    int start_time =  clock();
-    for(int i = 0; i < n; i++)
-    {
-        vector<Monster>monsters;
-        getInfo(monsters);
-        addRandomMonster(monsters);
-        printAll(monsters);
-        setInfo(monsters, true);
-        cout << "Searching by beginning name Ter" <<endl;
-        findMonsterByName("Ter", monsters);
-        cout << "Searching by range of damage from 25 to 70" << endl;
-        findMonsterByRangeOfDamage(25, 70, monsters);
-        cout << "Searching by ultimate attack increase damage"<<endl;
-        findMonsterByUltimateAttack("increase damage", monsters);
-        cout << "Searching monsters after time: 11.31.01 and date: 2019-02-10" <<endl;
-        findMonsterAfterSomeDate("2019-02-09", "11.31.01", monsters);
-        cout << "The end"<<endl;
-    }
-    int end_time =  clock();
-    cout<< "Time of working" <<( end_time-start_time)/(1000*320)<<endl;
-}
 void interactiveInterface(vector<Monster> monster)
 {
     bool flag = true, flagForSettingData = false;
@@ -365,8 +314,7 @@ void interactiveInterface(vector<Monster> monster)
         cout << 7 << " - Find by Ultimate attack"<<endl;
         cout << 8 << " - Find monster that was created after some time" << endl;
         cout << 9 << " - Create random monster" <<endl;
-        cout << 10 << " - Delete monster by ID" <<endl;
-        cout << 11 << " - Exit" << endl;
+        cout << 10 << " - Exit" << endl;
         cout << "Enter action" << endl;
         cin >> action;
         switch (action) {
@@ -417,20 +365,13 @@ void interactiveInterface(vector<Monster> monster)
                 cin >> time;
                 findMonsterAfterSomeDate(date, time, monster);
                 break;
-            //    cout << "Enter time in formate hh:mm:"
             }
             case 9:{
                 addRandomMonster(monster);
                 break;
             }
+
             case 10:{
-                string id;
-                cout << "Enter id of monster that you want to delete"<<endl;
-                cin >> id;
-                deleteMonsterByID(monster, id);
-                break;
-            }
-            case 11:{
                 flag = false;
                 break;
             }
@@ -455,7 +396,5 @@ void launch()
 }
 int main(int argc, const char * argv[]) {
     launch();
-//    demo(monsters);
-  //  benchmark( 195); // 10 cекунд роботи програми якщо початковий файл пустий
     return 0;
 }
