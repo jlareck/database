@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 using namespace std;
 //enum ultimateAttacks{ increaseDamage, extraDamage, healSelf, disableEnemy};
@@ -228,33 +229,33 @@ void findMonsterAfterSomeDate(string date,string time, vector<Monster> monsters)
                 printOneMonster(monsters[i]);
     }
 }
-void setInfo(vector<Monster> monsters, bool flag){
+int getMaxId(vector<Monster> monsters)
+{
+    int max=0;
+    for (int i = 0; i<monsters.size();i++)
+    {
+        if (stoi(monsters[i].id)>max)
+        {
+            max = stoi(monsters[i].id);
+        }
+    }
+    return max;
+}
+void setLastId(int max)
+{
     ofstream file;
+    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size");
+    file << max;
+    file.close();
+}
+void setInfo(vector<Monster> monsters, bool flag){
+    fstream file;
     if(!flag)
         file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data", ios_base::app);
     else
         file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data");
-    file<<monsters.size()<<endl;
-    for (int i = 0; i < monsters.size(); i++){
-        file << monsters[i].id<< endl;
-        file << monsters[i].name << endl;
-        file << monsters[i].healthPoint << endl;
-        file << monsters[i].damage << endl;
-        file << monsters[i].chanceOfUltimateAttack <<endl;
-        file << monsters[i].ultimateAttack << endl;
-        file << monsters[i].time << endl;
-        file << monsters[i].date << endl;
-        
-    }
-    file.close();
-}
-void setInfoInBinaryFile(vector<Monster> monsters, bool flag){
-    ofstream file;
-    if(!flag)
-        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data", ios_base::app|ios_base::binary);
-    else
-        file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data",ios_base::binary);
-    
+ 
+    setLastId(getMaxId(monsters));
     for (int i = 0; i < monsters.size(); i++){
         file << monsters[i].id<< endl;
         file << monsters[i].name << endl;
@@ -267,6 +268,7 @@ void setInfoInBinaryFile(vector<Monster> monsters, bool flag){
     }
     file.close();
 }
+
 void getInfo(vector<Monster>&monsters)
 {
     ifstream file;
@@ -439,22 +441,21 @@ void interactiveInterface(vector<Monster> monster)
         }
     }
 }
-
-int main(int argc, const char * argv[]) {
+void launch()
+{
     vector<Monster> monsters;
-   // createAndAddMonster(monsters);
     ifstream file;
-    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/data");
-   
+    file.open("/Users/mykolamedynsky/Desktop/1semester/database/database/size");
     string a;
     file>>a;
     file.close();
     if (a=="") identifier = 0;
     else identifier = stoi(a);
-    
     interactiveInterface(monsters);
+}
+int main(int argc, const char * argv[]) {
+    launch();
 //    demo(monsters);
   //  benchmark( 195); // 10 cекунд роботи програми якщо початковий файл пустий
-
     return 0;
 }
