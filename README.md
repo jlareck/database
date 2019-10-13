@@ -12,7 +12,7 @@ Implement training database "Monsters" with fields:
  Operations:
  
  - Create monster 
- - Save in memory (using std::vector or array or any other sata structure)
+ - Save in memory (using std::vector or array or any other data structure)
  - Save to database, text file or binary file (in my implementation I saved to database using sqlite library because it was task on extra points)
  - Read data from database
  - Print all monsters
